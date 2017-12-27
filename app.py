@@ -1,6 +1,7 @@
 import urllib.request
 import json
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def get_data(url):
     response = urllib.request.urlopen(url).read()
@@ -76,5 +77,9 @@ def position_data_to_dataframe(d):
     df["stop_id"] = stop_id
     return df
 
+
 if __name__ == "__main__":
-    pass
+    d = get_vehicle_positions()
+    df = position_data_to_dataframe(d)
+    df[df.latitude != 0].plot(x="longitude", y="latitude", kind="scatter")
+    plt.show()
