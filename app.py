@@ -3,7 +3,10 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly
-from plotly.graph_objs import Scatter, Layout
+import plotly.plotly as py
+plotly.tools.set_credentials_file(username='abachant', api_key='WWLZwB7VhIf7pkNRG9Kr')
+
+
 
 def get_data(url):
     response = urllib.request.urlopen(url).read()
@@ -83,18 +86,46 @@ def position_data_to_dataframe(d):
 if __name__ == "__main__":
     d = get_vehicle_positions()
     df = position_data_to_dataframe(d)
-    # print(df)
-    # df[df.latitude != 0].plot(x="longitude", y="latitude", kind="scatter")
-    # plt.show()
-    # cf.set_config_file(offline=False, world_readable=True, theme='ggplot')
-    # df.iplot(kind='scatter', mode='markers', x='longitude', y='latitude',
-    #     filename='cufflinks/simple-scatter')
-    # plot([go.Scatter(x=[df.latitude], y=[df.longitude])], filename='my-graph.html')
-    plotly.offline.plot({
-    "data": [
-        Scatter(x=[df["longitude"]], y=[df["latitude"]])
-    ],
-    "layout": Layout(
-        title="RIPTA Bus Network"
-    )
-    })
+
+    df.head()
+
+    df['text'] = df["vehicle_id"]
+
+    scl = [ [0,"rgb(5, 10, 172)"],[0.35,"rgb(40, 60, 190)"],[0.5,"rgb(70, 100, 245)"],\
+    [0.6,"rgb(90, 120, 245)"],[0.7,"rgb(106, 137, 247)"],[1,"rgb(220, 220, 220)"] ]
+
+    data = [ dict(
+        type = 'scattergeo',
+        locationmode = 'USA-states',
+        lon = df['longitude'],
+        lat = df['latitude'],
+        text = df['text'],
+        mode = 'markers',
+        marker = dict(
+            size = 8,
+            opacity = 0.8,
+            reversescale = True,
+            autocolorscale = False,
+            symbol = 'square',
+            line = dict(
+                width=1,
+                color='rgba(102, 102, 102)'
+            )
+            ))]
+    layout = dict(
+        title = 'Curent RIPTA Positions<br>(Hover for bus names)',
+        colorbar = True,
+        geo = dict(
+            scope='usa',
+            projection=dict( type='albers usa' ),
+            showland = True,
+            landcolor = "rgb(250, 250, 250)",
+            subunitcolor = "rgb(217, 217, 217)",
+            countrycolor = "rgb(217, 217, 217)",
+            countrywidth = 0.5,
+            subunitwidth = 0.5
+            ),
+        )
+
+    fig = dict( data=data, layout=layout )
+    url = py.plot( fig, validate=False, filename='d3-airports' )
