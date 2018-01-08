@@ -2,8 +2,8 @@ import urllib.request
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
-from plotly.offline import plot
-import plotly.graph_objs as go
+import plotly
+from plotly.graph_objs import Scatter, Layout
 
 def get_data(url):
     response = urllib.request.urlopen(url).read()
@@ -83,10 +83,18 @@ def position_data_to_dataframe(d):
 if __name__ == "__main__":
     d = get_vehicle_positions()
     df = position_data_to_dataframe(d)
-    print(df)
+    # print(df)
     # df[df.latitude != 0].plot(x="longitude", y="latitude", kind="scatter")
     # plt.show()
     # cf.set_config_file(offline=False, world_readable=True, theme='ggplot')
     # df.iplot(kind='scatter', mode='markers', x='longitude', y='latitude',
     #     filename='cufflinks/simple-scatter')
-    plot([go.Scatter(x=[df.latitude], y=[df.longitude])], filename='my-graph.html')
+    # plot([go.Scatter(x=[df.latitude], y=[df.longitude])], filename='my-graph.html')
+    plotly.offline.plot({
+    "data": [
+        Scatter(x=[df["longitude"]], y=[df["latitude"]])
+    ],
+    "layout": Layout(
+        title="RIPTA Bus Network"
+    )
+    })
