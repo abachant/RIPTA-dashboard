@@ -128,4 +128,4 @@ if __name__ == "__main__":
         )
 
     fig = dict( data=data, layout=layout )
-    url = py.plot( fig, validate=False, filename='d3-airports' )
+    url = py.iplot(data, filename='ripta-dashboard', sharing='public')
