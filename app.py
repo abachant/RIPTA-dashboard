@@ -4,11 +4,40 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly
 import plotly.plotly as py
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+import plotly.graph_objs as go
+import datetime
+
+mapbox_access_token = 'pk.eyJ1IjoiYWJhY2hhbnQiLCJhIjoiY2pjaHZncHJyMnBlMDJxdWo3dDlvN2ZsNyJ9.5iHY-9LLDNum2L7hqHomJw'
+
 plotly.tools.set_credentials_file(username='abachant', api_key='WWLZwB7VhIf7pkNRG9Kr')
 
+app = dash.Dash('RIPTA-App')
 
+# app = dash.Dash(__name__)
+# app.layout = html.Div(
+#     html.Div([
+#         html.H1('Realtime RIPTA Locations'),
+#         html.Div(id='live-update-text'),
+#         dcc.Graph(id='live-update-graph'),
+#         dcc.Interval(
+#             id='interval-component',
+#             interval=1*1000, # in milliseconds
+#             n_intervals=0
+#         )
+#     ])
+# )
+#
+#
+# # Multiple components can update everytime interval gets fired.
+# @app.callback(Output('live-update-graph', 'figure'),
+#               [Input('interval-component', 'n_intervals')])
 
 def get_data(url):
+    """Retreive data from RIPTA's API"""
     response = urllib.request.urlopen(url).read()
     response = json.loads(response)
     return response
@@ -29,6 +58,7 @@ def get_service_alerts():
     return get_data(url)
 
 def position_data_to_dataframe(d):
+    """Get relevant data and postion it to a pandas dataframe"""
     vehicle_id = []
     trip_id = []
     start_time = []
@@ -82,50 +112,89 @@ def position_data_to_dataframe(d):
     df["stop_id"] = stop_id
     return df
 
+d = get_vehicle_positions()
+df = position_data_to_dataframe(d)
+
+# def postion_dataframe_to_plotly():
+    # d = get_vehicle_positions()
+    # df = position_data_to_dataframe(d)
+    #
+    # df.head()
+    #
+    # df['text'] = df["vehicle_id"]
+    #
+    # scl = [ [0,"rgb(5, 10, 172)"],[0.35,"rgb(40, 60, 190)"],[0.5,"rgb(70, 100, 245)"],\
+    # [0.6,"rgb(90, 120, 245)"],[0.7,"rgb(106, 137, 247)"],[1,"rgb(220, 220, 220)"] ]
+    #
+    # data = [ dict(
+    #     type = 'scattergeo',
+    #     locationmode = 'USA-states',
+    #     lon = df['longitude'],
+    #     lat = df['latitude'],
+    #     text = df['text'],
+    #     mode = 'markers',
+    #     marker = dict(
+    #         size = 8,
+    #         opacity = 0.8,
+    #         reversescale = True,
+    #         autocolorscale = False,
+    #         symbol = 'square',
+    #         line = dict(
+    #             width=1,
+    #             color='rgba(102, 102, 102)'
+    #         )
+    #         ))]
+    # layout = dict(
+    #     title = 'Current RIPTA Positions<br>(Hover for bus names and routes)',
+    #     colorbar = True,
+    #     geo = dict(
+    #         scope='usa',
+    #         projection=dict( type='albers usa' ),
+    #         showland = True,
+    #         landcolor = "rgb(250, 250, 250)",
+    #         subunitcolor = "rgb(217, 217, 217)",
+    #         countrycolor = "rgb(217, 217, 217)",
+    #         countrywidth = 0.5,
+    #         subunitwidth = 0.5
+    #         ),
+    #     )
+    #
+    # fig = dict( data=data, layout=layout )
+    # url = py.iplot(data, filename='ripta-dashboard', sharing='public')
+
+app.layout = html.Div(children=[
+    html.H1(children='Realtime RIPTA Locations'),
+
+    html.Div(children='''
+        A Dashboard for all RIPTA vehicles and routes.
+    '''),
+
+    dcc.Graph(
+        figure=go.Figure(
+        data=[
+            go.Scattergeo(
+                lon=df['longitude'],
+                lat=df['latitude'],
+                name='Buses',
+                marker=go.Marker(
+                    color='rgb(55, 83, 109)'
+                )
+            )
+        ],
+        layout=go.Layout(
+            title='All Current RIPTA Locations',
+            showlegend=True,
+            legend=go.Legend(
+                x=0,
+                y=1.0
+            ),
+            margin=go.Margin(l=40, r=0, t=40, b=30)
+        )
+    ),
+    style={'height': 300},
+    id='my-graph'
+    )
+])
 
 if __name__ == "__main__":
-    d = get_vehicle_positions()
-    df = position_data_to_dataframe(d)
-
-    df.head()
-
-    df['text'] = df["vehicle_id"]
-
-    scl = [ [0,"rgb(5, 10, 172)"],[0.35,"rgb(40, 60, 190)"],[0.5,"rgb(70, 100, 245)"],\
-    [0.6,"rgb(90, 120, 245)"],[0.7,"rgb(106, 137, 247)"],[1,"rgb(220, 220, 220)"] ]
-
-    data = [ dict(
-        type = 'scattergeo',
-        locationmode = 'USA-states',
-        lon = df['longitude'],
-        lat = df['latitude'],
-        text = df['text'],
-        mode = 'markers',
-        marker = dict(
-            size = 8,
-            opacity = 0.8,
-            reversescale = True,
-            autocolorscale = False,
-            symbol = 'square',
-            line = dict(
-                width=1,
-                color='rgba(102, 102, 102)'
-            )
-            ))]
-    layout = dict(
-        title = 'Curent RIPTA Positions<br>(Hover for bus names)',
-        colorbar = True,
-        geo = dict(
-            scope='usa',
-            projection=dict( type='albers usa' ),
-            showland = True,
-            landcolor = "rgb(250, 250, 250)",
-            subunitcolor = "rgb(217, 217, 217)",
-            countrycolor = "rgb(217, 217, 217)",
-            countrywidth = 0.5,
-            subunitwidth = 0.5
-            ),
-        )
-
-    fig = dict( data=data, layout=layout )
-    url = py.iplot(data, filename='ripta-dashboard', sharing='public')
+    app.run_server(debug=True)
