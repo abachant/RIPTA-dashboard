@@ -8,7 +8,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import plotly.graph_objs as go
+from plotly.graph_objs import *
 import datetime
 
 mapbox_access_token = 'pk.eyJ1IjoiYWJhY2hhbnQiLCJhIjoiY2pjaHZncHJyMnBlMDJxdWo3dDlvN2ZsNyJ9.5iHY-9LLDNum2L7hqHomJw'
@@ -162,6 +162,34 @@ df = position_data_to_dataframe(d)
     # fig = dict( data=data, layout=layout )
     # url = py.iplot(data, filename='ripta-dashboard', sharing='public')
 
+data = Data([
+    Scattermapbox(
+        lat=df['latitude'],
+        lon=df['longitude'],
+        mode='markers',
+        marker=Marker(
+            size=9
+        ),
+        text=df['vehicle_id'],
+    )
+])
+layout = Layout(
+    autosize=True,
+    hovermode='closest',
+    mapbox=dict(
+        accesstoken=mapbox_access_token,
+        bearing=0,
+        center=dict(
+            lat=41.83,
+            lon=-71.41
+        ),
+        pitch=0,
+        zoom=10
+    ),
+)
+
+fig = dict(data=data, layout=layout)
+
 app.layout = html.Div(children=[
     html.H1(children='Realtime RIPTA Locations'),
 
@@ -170,31 +198,10 @@ app.layout = html.Div(children=[
     '''),
 
     dcc.Graph(
-        figure=go.Figure(
-        data=[
-            go.Scattergeo(
-                lon=df['longitude'],
-                lat=df['latitude'],
-                name='Buses',
-                hovertext=(df['route_id'] + ", " + df['vehicle_id']),
-                marker=go.Marker(
-                    color='rgb(55, 83, 109)'
-                )
-            )
-        ],
-        layout=go.Layout(
-            title='All Current RIPTA Locations',
-            showlegend=True,
-            legend=go.Legend(
-                x=0,
-                y=1.0
-            ),
-            margin=go.Margin(l=40, r=0, t=40, b=30)
-        )
-    ),
-    style={'height': 300},
-    id='live-update-graph'
-    ),
+        figure=Figure(fig),
+            style={'height': 700},
+        id='live-update-graph'
+        ),
     dcc.Interval(
         id='interval-component',
         interval=1*5000, # in milliseconds
@@ -202,35 +209,35 @@ app.layout = html.Div(children=[
     )
 ])
 
-@app.callback(Output('live-update-graph', 'figure'),
-              [Input('interval-component', 'n_intervals')])
-
-def update_graph_live(n):
-    d = get_vehicle_positions()
-    df = position_data_to_dataframe(d)
-
-    return go.Figure(
-    data=[
-        go.Scattergeo(
-            lon=df['longitude'],
-            lat=df['latitude'],
-            name='Buses',
-            hovertext=(df['route_id'] + ", " + df['vehicle_id']),
-            marker=go.Marker(
-                color='rgb(55, 83, 109)'
-            )
-        )
-    ],
-    layout=go.Layout(
-        title='All Current RIPTA Locations',
-        showlegend=True,
-        legend=go.Legend(
-            x=0,
-            y=1.0
-        ),
-        margin=go.Margin(l=40, r=0, t=40, b=30)
-    )
-    )
+# @app.callback(Output('live-update-graph', 'figure'),
+#               [Input('interval-component', 'n_intervals')])
+#
+# def update_graph_live(n):
+#     d = get_vehicle_positions()
+#     df = position_data_to_dataframe(d)
+#
+#     return go.Figure(
+#     data=[
+#         go.Scattergeo(
+#             lon=df['longitude'],
+#             lat=df['latitude'],
+#             name='Buses',
+#             hovertext=(df['route_id'] + ", " + df['vehicle_id']),
+#             marker=go.Marker(
+#                 color='rgb(55, 83, 109)'
+#             )
+#         )
+#     ],
+#     layout=go.Layout(
+#         title='All Current RIPTA Locations',
+#         showlegend=True,
+#         legend=go.Legend(
+#             x=0,
+#             y=1.0
+#         ),
+#         margin=go.Margin(l=40, r=0, t=40, b=30)
+#     )
+#     )
 
 
 if __name__ == "__main__":
