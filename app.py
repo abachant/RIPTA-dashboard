@@ -176,6 +176,7 @@ app.layout = html.Div(children=[
                 lon=df['longitude'],
                 lat=df['latitude'],
                 name='Buses',
+                hovertext=(df['route_id'] + ", " + df['vehicle_id']),
                 marker=go.Marker(
                     color='rgb(55, 83, 109)'
                 )
@@ -192,9 +193,45 @@ app.layout = html.Div(children=[
         )
     ),
     style={'height': 300},
-    id='my-graph'
+    id='live-update-graph'
+    ),
+    dcc.Interval(
+        id='interval-component',
+        interval=1*5000, # in milliseconds
+        n_intervals=0
     )
 ])
+
+@app.callback(Output('live-update-graph', 'figure'),
+              [Input('interval-component', 'n_intervals')])
+
+def update_graph_live(n):
+    d = get_vehicle_positions()
+    df = position_data_to_dataframe(d)
+
+    return go.Figure(
+    data=[
+        go.Scattergeo(
+            lon=df['longitude'],
+            lat=df['latitude'],
+            name='Buses',
+            hovertext=(df['route_id'] + ", " + df['vehicle_id']),
+            marker=go.Marker(
+                color='rgb(55, 83, 109)'
+            )
+        )
+    ],
+    layout=go.Layout(
+        title='All Current RIPTA Locations',
+        showlegend=True,
+        legend=go.Legend(
+            x=0,
+            y=1.0
+        ),
+        margin=go.Margin(l=40, r=0, t=40, b=30)
+    )
+    )
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)
