@@ -115,53 +115,6 @@ def position_data_to_dataframe(d):
 d = get_vehicle_positions()
 df = position_data_to_dataframe(d)
 
-# def postion_dataframe_to_plotly():
-    # d = get_vehicle_positions()
-    # df = position_data_to_dataframe(d)
-    #
-    # df.head()
-    #
-    # df['text'] = df["vehicle_id"]
-    #
-    # scl = [ [0,"rgb(5, 10, 172)"],[0.35,"rgb(40, 60, 190)"],[0.5,"rgb(70, 100, 245)"],\
-    # [0.6,"rgb(90, 120, 245)"],[0.7,"rgb(106, 137, 247)"],[1,"rgb(220, 220, 220)"] ]
-    #
-    # data = [ dict(
-    #     type = 'scattergeo',
-    #     locationmode = 'USA-states',
-    #     lon = df['longitude'],
-    #     lat = df['latitude'],
-    #     text = df['text'],
-    #     mode = 'markers',
-    #     marker = dict(
-    #         size = 8,
-    #         opacity = 0.8,
-    #         reversescale = True,
-    #         autocolorscale = False,
-    #         symbol = 'square',
-    #         line = dict(
-    #             width=1,
-    #             color='rgba(102, 102, 102)'
-    #         )
-    #         ))]
-    # layout = dict(
-    #     title = 'Current RIPTA Positions<br>(Hover for bus names and routes)',
-    #     colorbar = True,
-    #     geo = dict(
-    #         scope='usa',
-    #         projection=dict( type='albers usa' ),
-    #         showland = True,
-    #         landcolor = "rgb(250, 250, 250)",
-    #         subunitcolor = "rgb(217, 217, 217)",
-    #         countrycolor = "rgb(217, 217, 217)",
-    #         countrywidth = 0.5,
-    #         subunitwidth = 0.5
-    #         ),
-    #     )
-    #
-    # fig = dict( data=data, layout=layout )
-    # url = py.iplot(data, filename='ripta-dashboard', sharing='public')
-
 data = Data([
     Scattermapbox(
         lat=df['latitude'],
@@ -199,45 +152,52 @@ app.layout = html.Div(children=[
 
     dcc.Graph(
         figure=Figure(fig),
-            style={'height': 700},
+        style={'height': 900},
         id='live-update-graph'
         ),
     dcc.Interval(
         id='interval-component',
-        interval=1*5000, # in milliseconds
+        interval=1*10000, # in milliseconds
         n_intervals=0
     )
 ])
 
-# @app.callback(Output('live-update-graph', 'figure'),
-#               [Input('interval-component', 'n_intervals')])
-#
-# def update_graph_live(n):
-#     d = get_vehicle_positions()
-#     df = position_data_to_dataframe(d)
-#
-#     return go.Figure(
-#     data=[
-#         go.Scattergeo(
-#             lon=df['longitude'],
-#             lat=df['latitude'],
-#             name='Buses',
-#             hovertext=(df['route_id'] + ", " + df['vehicle_id']),
-#             marker=go.Marker(
-#                 color='rgb(55, 83, 109)'
-#             )
-#         )
-#     ],
-#     layout=go.Layout(
-#         title='All Current RIPTA Locations',
-#         showlegend=True,
-#         legend=go.Legend(
-#             x=0,
-#             y=1.0
-#         ),
-#         margin=go.Margin(l=40, r=0, t=40, b=30)
-#     )
-#     )
+@app.callback(Output('live-update-graph', 'figure'),
+              [Input('interval-component', 'n_intervals')])
+
+def update_graph_live(n):
+    d = get_vehicle_positions()
+    df = position_data_to_dataframe(d)
+
+    data = Data([
+        Scattermapbox(
+            lat=df['latitude'],
+            lon=df['longitude'],
+            mode='markers',
+            marker=Marker(
+                size=9
+            ),
+            text=df['vehicle_id'],
+        )
+    ])
+    layout = Layout(
+        autosize=True,
+        hovermode='closest',
+        mapbox=dict(
+            accesstoken=mapbox_access_token,
+            bearing=0,
+            center=dict(
+                lat=41.83,
+                lon=-71.41
+            ),
+            pitch=0,
+            zoom=10
+        ),
+    )
+
+    fig = dict(data=data, layout=layout)
+
+    return Figure(fig)
 
 
 if __name__ == "__main__":
