@@ -7,7 +7,7 @@ import plotly.plotly as py
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from plotly.graph_objs import *
 import datetime
 
@@ -157,18 +157,17 @@ app.layout = html.Div(children=[
         ),
     dcc.Interval(
         id='interval-component',
-        interval=1*10000, # in milliseconds
+        interval=1 * 500, # in milliseconds
         n_intervals=0
     )
 ])
 
 @app.callback(Output('live-update-graph', 'figure'),
-              [Input('interval-component', 'n_intervals')])
-
-def update_graph_live(n):
+              [Input('interval-component', 'n_intervals')],
+              [State('live-update-graph', 'figure')])
+def update_graph_live(n, fig):
     d = get_vehicle_positions()
     df = position_data_to_dataframe(d)
-
     data = Data([
         Scattermapbox(
             lat=df['latitude'],
@@ -180,24 +179,8 @@ def update_graph_live(n):
             text=df['vehicle_id'],
         )
     ])
-    layout = Layout(
-        autosize=True,
-        hovermode='closest',
-        mapbox=dict(
-            accesstoken=mapbox_access_token,
-            bearing=0,
-            center=dict(
-                lat=41.83,
-                lon=-71.41
-            ),
-            pitch=0,
-            zoom=10
-        ),
-    )
-
-    fig = dict(data=data, layout=layout)
-
-    return Figure(fig)
+    fig["data"] = data
+    return fig
 
 
 if __name__ == "__main__":
