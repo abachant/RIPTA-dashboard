@@ -17,25 +17,6 @@ plotly.tools.set_credentials_file(username='abachant', api_key='WWLZwB7VhIf7pkNR
 
 app = dash.Dash('RIPTA-App')
 
-# app = dash.Dash(__name__)
-# app.layout = html.Div(
-#     html.Div([
-#         html.H1('Realtime RIPTA Locations'),
-#         html.Div(id='live-update-text'),
-#         dcc.Graph(id='live-update-graph'),
-#         dcc.Interval(
-#             id='interval-component',
-#             interval=1*1000, # in milliseconds
-#             n_intervals=0
-#         )
-#     ])
-# )
-#
-#
-# # Multiple components can update everytime interval gets fired.
-# @app.callback(Output('live-update-graph', 'figure'),
-#               [Input('interval-component', 'n_intervals')])
-
 def get_data(url):
     """Retreive data from RIPTA's API"""
     response = urllib.request.urlopen(url).read()
@@ -123,7 +104,7 @@ data = Data([
         marker=Marker(
             size=9
         ),
-        text=df['vehicle_id'],
+        text=(df['vehicle_id'] +", "+ df['route_id']),
     )
 ])
 layout = Layout(
@@ -149,39 +130,129 @@ app.layout = html.Div(children=[
     html.Div(children='''
         A Dashboard for all RIPTA vehicles and routes.
     '''),
+    html.Hr(),
 
+    html.Label('Choose which bus routes to view'),
+
+    dcc.Dropdown(
+        id='route-dropdown',
+        options=[
+        {'label': 'All', 'value': 'All'},
+        {'label': 'R/L', 'value': '11'},
+        {'label': '1', 'value': '1'},
+        {'label': '3', 'value': '3'},
+        {'label': '6', 'value': '6'},
+        {'label': '8x', 'value': 'MTL'},
+        {'label': '9x', 'value': 'MTL'},
+        {'label': '10x', 'value': 'MTL'},
+        {'label': '12x', 'value': 'MTL'},
+        {'label': '13', 'value': '13'},
+        {'label': '14', 'value': '14'},
+        {'label': '17', 'value': '17'},
+        {'label': '18', 'value': '18'},
+        {'label': '19', 'value': '19'},
+        {'label': '20', 'value': '20'},
+        {'label': '21', 'value': '21'},
+        {'label': '22', 'value': '22'},
+        {'label': '27', 'value': '27'},
+        {'label': '28', 'value': '28'},
+        {'label': '29', 'value': '29'},
+        {'label': '30', 'value': '30'},
+        {'label': '31', 'value': '31'},
+        {'label': '32', 'value': '32'},
+        {'label': '33', 'value': '33'},
+        {'label': '34', 'value': '34'},
+        {'label': '35', 'value': '35'},
+        {'label': '40', 'value': '40'},
+        {'label': '49', 'value': '49'},
+        {'label': '50', 'value': '50'},
+        {'label': '51', 'value': '51'},
+        {'label': '54', 'value': '54'},
+        {'label': '55', 'value': '55'},
+        {'label': '56', 'value': '56'},
+        {'label': '57', 'value': '57'},
+        {'label': '58', 'value': '58'},
+        {'label': '59x', 'value': 'MTL'},
+        {'label': '60', 'value': '60'},
+        {'label': '61x', 'value': 'MTL'},
+        {'label': '62', 'value': '62'},
+        {'label': '63', 'value': '63'},
+        {'label': '64', 'value': '64'},
+        {'label': '65x', 'value': 'MTL'},
+        {'label': '66', 'value': '66'},
+        {'label': '67', 'value': '67'},
+        {'label': '71', 'value': '71'},
+        {'label': '72', 'value': '72'},
+        {'label': '73', 'value': '73'},
+        {'label': '75', 'value': '75'},
+        {'label': '76', 'value': '76'},
+        {'label': '78', 'value': '78'},
+        {'label': '80', 'value': '80'},
+        {'label': '87', 'value': '87'},
+        {'label': '92', 'value': '92'},
+        {'label': '95x', 'value': 'MTL'},
+            ],
+        value='All',
+        ),
     dcc.Graph(
         figure=Figure(fig),
-        style={'height': 900},
+        style={'height': 800},
         id='live-update-graph'
         ),
     dcc.Interval(
         id='interval-component',
-        interval=1 * 500, # in milliseconds
+        interval=1 * 5000, # in milliseconds
         n_intervals=0
-    )
+        ),
+    dcc.Markdown("Source: Transit API(http://realtime.ripta.com:81/)",
+                     className="source"),
 ])
 
 @app.callback(Output('live-update-graph', 'figure'),
-              [Input('interval-component', 'n_intervals')],
+              [Input('interval-component', 'n_intervals'),
+              Input('route-dropdown', 'value')],
               [State('live-update-graph', 'figure')])
-def update_graph_live(n, fig):
+
+def update_graph_live(n, fig, value):
     d = get_vehicle_positions()
     df = position_data_to_dataframe(d)
-    data = Data([
-        Scattermapbox(
-            lat=df['latitude'],
-            lon=df['longitude'],
-            mode='markers',
-            marker=Marker(
-                size=9
-            ),
-            text=df['vehicle_id'],
-        )
-    ])
+    if value != 'All':
+        selected_routes = df['route_id'] == str(value)
+        data = Data([
+            Scattermapbox(
+                lat=(df[value]['latitude']),
+                lon=(df[value]['longitude']),
+                mode='markers',
+                marker=Marker(
+                    size=9
+                ),
+                hovertext=(df['route_id'] + ", " + df['vehicle_id']),
+            )
+        ])
+    else:
+        data = Data([
+            Scattermapbox(
+                lat=df['latitude'],
+                lon=df['longitude'],
+                mode='markers',
+                marker=Marker(
+                    size=9
+                ),
+                hovertext=(df['route_id'] + ", " + df['vehicle_id']),
+            )
+        ])
     fig["data"] = data
     return fig
 
+external_css = ["https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css",
+                "//fonts.googleapis.com/css?family=Raleway:400,300,600",
+                "//fonts.googleapis.com/css?family=Dosis:Medium",
+                "https://cdn.rawgit.com/plotly/dash-app-stylesheets/62f0eb4f1fadbefea64b2404493079bf848974e8/dash-uber-ride-demo.css",
+                "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"]
+
+
+for css in external_css:
+    app.css.append_css({"external_url": css})
 
 if __name__ == "__main__":
     app.run_server(debug=True)
