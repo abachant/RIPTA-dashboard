@@ -128,9 +128,31 @@ layout = Layout(
     ),
 )
 
-# available_routes = [{'label': 'All', 'value': 'All'}]
-# for i in df.route_id:
-#     available_routes.append({'label': i, 'value': i})
+available_routes = [{'label': 'All', 'value': 'All'}]
+working_route_list = list(df.route_id)
+
+def search_active_routes(routes, term):
+    """Find which bus routes are current active"""
+    is_in=False
+    for i in routes:
+        if term in i.values():
+            is_in=True
+            break
+        else:
+            pass
+    return is_in
+
+def all_active_routes():
+    """Organize all active routes into a single list"""
+    for i in working_route_list:
+        if i==11 and search_active_routes(available_routes, i) == False:
+            available_routes.append({'label': 'R/L', 'value': i})
+        elif search_active_routes(available_routes, i) == False:
+            available_routes.append({'label': i, 'value': i})
+        else:
+            pass
+
+all_active_routes()
 
 fig = dict(data=data, layout=layout)
 
@@ -146,62 +168,7 @@ app.layout = html.Div(children=[
 
     dcc.Dropdown(
         id='route-dropdown',
-        options=[
-            {'label': 'All', 'value': 'All'},
-            {'label': 'R/L', 'value': '11'},
-            {'label': '1', 'value': '1'},
-            {'label': '3', 'value': '3'},
-            {'label': '6', 'value': '6'},
-            # {'label': '8x', 'value': 'MTL'},
-            # {'label': '9x', 'value': 'MTL'},
-            # {'label': '10x', 'value': 'MTL'},
-            # {'label': '12x', 'value': 'MTL'},
-            {'label': '13', 'value': '13'},
-            {'label': '14', 'value': '14'},
-            {'label': '17', 'value': '17'},
-            {'label': '18', 'value': '18'},
-            {'label': '19', 'value': '19'},
-            {'label': '20', 'value': '20'},
-            {'label': '21', 'value': '21'},
-            {'label': '22', 'value': '22'},
-            {'label': '27', 'value': '27'},
-            {'label': '28', 'value': '28'},
-            {'label': '29', 'value': '29'},
-            {'label': '30', 'value': '30'},
-            {'label': '31', 'value': '31'},
-            {'label': '32', 'value': '32'},
-            {'label': '33', 'value': '33'},
-            {'label': '34', 'value': '34'},
-            {'label': '35', 'value': '35'},
-            {'label': '40', 'value': '40'},
-            {'label': '49', 'value': '49'},
-            {'label': '50', 'value': '50'},
-            {'label': '51', 'value': '51'},
-            {'label': '54', 'value': '54'},
-            {'label': '55', 'value': '55'},
-            {'label': '56', 'value': '56'},
-            {'label': '57', 'value': '57'},
-            {'label': '58', 'value': '58'},
-            # {'label': '59x', 'value': 'MTL'},
-            {'label': '60', 'value': '60'},
-            # {'label': '61x', 'value': 'MTL'},
-            {'label': '62', 'value': '62'},
-            {'label': '63', 'value': '63'},
-            {'label': '64', 'value': '64'},
-            # {'label': '65x', 'value': 'MTL'},
-            {'label': '66', 'value': '66'},
-            {'label': '67', 'value': '67'},
-            {'label': '71', 'value': '71'},
-            {'label': '72', 'value': '72'},
-            {'label': '73', 'value': '73'},
-            {'label': '75', 'value': '75'},
-            {'label': '76', 'value': '76'},
-            {'label': '78', 'value': '78'},
-            {'label': '80', 'value': '80'},
-            {'label': '87', 'value': '87'},
-            {'label': '92', 'value': '92'},
-            # {'label': '95x', 'value': 'MTL'}
-            ],
+        options=available_routes,
         value='All',
         ),
     dcc.Graph(
@@ -230,16 +197,7 @@ def update_graph_live(n, value, fig):
         value = int(value)
     except ValueError:
         pass
-    print("Route IDs")
-    print(df.route_id)
-    # print("DF before", df)
-    print("Value is", value)
-    print("Value type is", type(value))
-    if value in df.route_id:
-        print("Filtering dataframe")
-        df = df[df.route_id == value]
-    # print("DF after", df)
-    print("DataFrame has", len(df), "rows")
+
     data = Data([
         Scattermapbox(
             lat=(df['latitude']),
