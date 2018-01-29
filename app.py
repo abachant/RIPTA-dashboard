@@ -97,11 +97,10 @@ def position_data_to_dataframe(d):
 
 def make_data_frame():
     d = get_vehicle_positions()
-    global df
     df = position_data_to_dataframe(d)
     return df
 
-make_data_frame()
+df = make_data_frame()
 
 data = Data([
     Scattermapbox(
@@ -128,6 +127,10 @@ layout = Layout(
         zoom=10
     ),
 )
+
+# available_routes = [{'label': 'All', 'value': 'All'}]
+# for i in df.route_id:
+#     available_routes.append({'label': i, 'value': i})
 
 fig = dict(data=data, layout=layout)
 
