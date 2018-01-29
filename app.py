@@ -95,8 +95,13 @@ def position_data_to_dataframe(d):
     df["stop_id"] = stop_id
     return df
 
-d = get_vehicle_positions()
-df = position_data_to_dataframe(d)
+def make_data_frame():
+    d = get_vehicle_positions()
+    global df
+    df = position_data_to_dataframe(d)
+    return df
+
+make_data_frame()
 
 data = Data([
     Scattermapbox(
@@ -203,7 +208,7 @@ app.layout = html.Div(children=[
         ),
     dcc.Interval(
         id='interval-component',
-        interval=1 * 5000, # in milliseconds
+        interval=1 * 5000, # reload time in milliseconds
         n_intervals=0
         ),
     dcc.Markdown("Source: Transit API(http://realtime.ripta.com:81/)",
