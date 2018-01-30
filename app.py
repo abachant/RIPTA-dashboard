@@ -11,6 +11,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from plotly.graph_objs import *
 import datetime
+from operator import itemgetter
 
 mapbox_access_token = 'pk.eyJ1IjoiYWJhY2hhbnQiLCJhIjoiY2pjaHZncHJyMnBlMDJxdWo3dDlvN2ZsNyJ9.5iHY-9LLDNum2L7hqHomJw'
 
@@ -129,6 +130,7 @@ layout = Layout(
 )
 
 available_routes = [{'label': 'All', 'value': 'All'}]
+available_routes_numeric = []
 working_route_list = list(df.route_id)
 
 def search_active_routes(routes, term):
@@ -142,17 +144,23 @@ def search_active_routes(routes, term):
             pass
     return is_in
 
+# def order_available_routes(ar):
+
+
 def all_active_routes():
     """Organize all active routes into a single list"""
     for i in working_route_list:
         if i==11 and search_active_routes(available_routes, i) == False:
             available_routes.append({'label': 'R/L', 'value': i})
-        elif search_active_routes(available_routes, i) == False:
-            available_routes.append({'label': i, 'value': i})
+        elif search_active_routes(available_routes_numeric, i) == False:
+            available_routes_numeric.append({'label': i, 'value': i})
         else:
             pass
 
 all_active_routes()
+
+available_routes_numeric = sorted(available_routes_numeric, key=itemgetter('value'))
+available_routes = available_routes + available_routes_numeric
 
 fig = dict(data=data, layout=layout)
 
@@ -161,7 +169,7 @@ app.layout = html.Div(children=[
 
     html.Div(children='''
         A Dashboard for all RIPTA vehicles and routes.
-    '''),
+        '''),
     html.Hr(),
 
     html.Label('Choose which bus routes to view'),
@@ -197,7 +205,9 @@ def update_graph_live(n, value, fig):
         value = int(value)
     except ValueError:
         pass
-
+    if value in df.route_id:
+        print("Filtering dataframe")
+        df = df[df.route_id == value]
     data = Data([
         Scattermapbox(
             lat=(df['latitude']),
@@ -206,7 +216,7 @@ def update_graph_live(n, value, fig):
             marker=Marker(
                 size=9
             ),
-            hovertext=(df['route_id'].astype(str) + ", " + df['vehicle_id']),
+            hovertext=("test"),
         )
     ])
     fig["data"] = data
