@@ -89,6 +89,7 @@ def position_data_to_dataframe(d):
     df["bearing"] = bearing
     df["odometer"] = odometer
     df["speed"] = speed
+    df.speed = round(df.speed, 1)
     df["current_stop_sequence"] = current_stop_sequence
     df["current_status"] = current_status
     df["timestamp"] = timestamp
@@ -111,7 +112,7 @@ data = Data([
         marker=Marker(
             size=9
         ),
-        text="yo",
+        text="test",
     )
 ])
 layout = Layout(
@@ -144,11 +145,8 @@ def search_active_routes(routes, term):
             pass
     return is_in
 
-# def order_available_routes(ar):
-
-
 def all_active_routes():
-    """Organize all active routes into a single list"""
+    """Organize all active routes"""
     for i in working_route_list:
         if i==11 and search_active_routes(available_routes, i) == False:
             available_routes.append({'label': 'R/L', 'value': i})
@@ -206,7 +204,6 @@ def update_graph_live(n, value, fig):
     except ValueError:
         pass
     if value in df.route_id:
-        print("Filtering dataframe")
         df = df[df.route_id == value]
     data = Data([
         Scattermapbox(
@@ -216,7 +213,7 @@ def update_graph_live(n, value, fig):
             marker=Marker(
                 size=9
             ),
-            hovertext=("test"),
+            hovertext=(df.route_id.astype(str) + ", " + df.vehicle_id.astype(str) + ", " + df.speed.astype(str) + "mph"),
         )
     ])
     fig["data"] = data
