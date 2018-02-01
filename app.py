@@ -180,7 +180,8 @@ app.layout = html.Div(children=[
     dcc.Graph(
         figure=Figure(fig),
         style={'height': 800},
-        id='live-update-graph'
+        id='live-update-graph',
+        animate=True
         ),
     dcc.Interval(
         id='interval-component',
