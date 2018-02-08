@@ -215,7 +215,7 @@ def update_graph_live(n, value, fig):
             marker=Marker(
                 size=9
             ),
-            hovertext=("Line: " + df.route_id.astype(str) + ", ID:" + df.vehicle_id.astype(str) + ", Speed: " + df.speed.astype(str) + " mph"),
+            hovertext=("Line: " + df.route_id.astype(str) + ", ID: " + df.vehicle_id.astype(str) + ", Speed: " + df.speed.astype(str) + " mph"),
         )
     ])
     fig["data"] = data
