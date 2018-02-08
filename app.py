@@ -135,7 +135,7 @@ available_routes_numeric = []
 working_route_list = list(df.route_id)
 
 def search_active_routes(routes, term):
-    """Find which bus routes are current active"""
+    """Find which bus routes are currently active"""
     is_in=False
     for i in routes:
         if term in i.values():
@@ -181,7 +181,7 @@ app.layout = html.Div(children=[
         figure=Figure(fig),
         style={'height': 800},
         id='live-update-graph',
-        animate=True
+        # adding 'animate=True' here would make for smoother callbacks but unfortunately it is still in beta and breaks our ability to maintain camera's position and zoom
         ),
     dcc.Interval(
         id='interval-component',
@@ -198,6 +198,7 @@ app.layout = html.Div(children=[
               [State('live-update-graph', 'figure')])
 
 def update_graph_live(n, value, fig):
+    """Updates the data being plotted at every n_interval"""
     d = get_vehicle_positions()
     df = position_data_to_dataframe(d)
     try:
