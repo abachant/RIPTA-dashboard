@@ -3,9 +3,9 @@ Visualizing realtime data from RIPTA's API using Dash.
 
 PRs Welcome!  
 
-![](RIPTA-dashboard/screenshots/Ripta-Dash.png)  
+[Imgur](https://i.imgur.com/yyCFtfQ.png)  
 
-![](RIPTA-dashboard/screenshots/Ripta-Dash2.gif)
+[Imgur](https://i.imgur.com/TEcu88o.gifv)
 
 ## Data Structure
 ### Vehicle Position Data
