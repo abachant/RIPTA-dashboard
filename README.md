@@ -7,7 +7,8 @@ PRs Welcome!
 An example of the interface.
 
 <img src="https://i.imgur.com/TEcu88o.gif" alt="animation of RIPTA-dashboard">  
-An animation sped up for effect.
+An animation sped up for effect.  
+
 ## Data Structure
 ### Vehicle Position Data
 A dictionary with two keys: "header" and "entity".
