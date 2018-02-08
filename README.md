@@ -3,9 +3,13 @@ Visualizing realtime data from RIPTA's API using Dash.
 
 PRs Welcome!  
 
-<img src="https://i.imgur.com/yyCFtfQ.png" alt="closeup of hovertext"  
+An example of the interface.  
 
-<img src="https://i.imgur.com/TEcu88o.gifv" alt="animation of RIPTA-dashboard"
+<img src="https://i.imgur.com/yyCFtfQ.png" alt="closeup of hovertext">  
+
+An animation sped up for effect.  
+
+<img src="https://i.imgur.com/TEcu88o.gifv" alt="animation of RIPTA-dashboard">  
 
 ## Data Structure
 ### Vehicle Position Data
