@@ -3,11 +3,24 @@ Visualizing realtime data from RIPTA's API using Dash.
 
 PRs Welcome!  
 
-An example of the interface.  
+An example of the interface:  
 <img src="https://i.imgur.com/yyCFtfQ.png" alt="closeup of hovertext">  
 
-An animation sped up for effect.  
+An animation sped up for effect:  
 <img src="https://i.imgur.com/TEcu88o.gif" alt="animation of RIPTA-dashboard">
+
+## Requirements
+### Accounts
+* [Plotly](https://plot.ly/accounts/login/?action=login)
+* [Mapbox](https://www.mapbox.com/signin/)
+### Python Modules
+* pandas
+* numpy
+* matplotlib
+* plotly
+* dash
+* dash_core_components
+* dash_html_components
 
 ## Data Structure
 ### Vehicle Position Data
