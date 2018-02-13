@@ -13,7 +13,13 @@ from plotly.graph_objs import *
 import datetime
 from operator import itemgetter
 
-mapbox_access_token = 'pk.eyJ1IjoiYWJhY2hhbnQiLCJhIjoiY2pjaHZncHJyMnBlMDJxdWo3dDlvN2ZsNyJ9.5iHY-9LLDNum2L7hqHomJw'
+with open('config.json') as f:
+     credentials = json.loads(f.read())
+
+print(credentials['username'])
+mapbox_access_token = credentials["mapbox_access_token"]
+username = credentials["username"]
+api_key = credentials["api_key"]
 
 plotly.tools.set_credentials_file(username='abachant', api_key='WWLZwB7VhIf7pkNRG9Kr')
 
@@ -181,7 +187,7 @@ app.layout = html.Div(children=[
         figure=Figure(fig),
         style={'height': 800},
         id='live-update-graph',
-        # adding 'animate=True' here would make for smoother callbacks but unfortunately it is still in beta and breaks our ability to maintain camera's position and zoom
+        # 'animate=True' here would make for smoother callbacks but it is still in beta and breaks our ability to maintain camera's position and zoom
         ),
     dcc.Interval(
         id='interval-component',

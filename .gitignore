@@ -101,5 +101,8 @@ ENV/
 .mypy_cache/
 temp
 
-#newapp.py
+# newapp.py
 /newapp.py
+
+# config.json
+/config.json
