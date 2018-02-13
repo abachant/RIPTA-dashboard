@@ -14,7 +14,7 @@ import datetime
 from operator import itemgetter
 
 with open('config.json') as f:
-     credentials = json.loads(f.read())
+     credentials = json.load(f)
 
 mapbox_access_token = credentials["mapbox_access_token"]
 username = credentials["username"]
