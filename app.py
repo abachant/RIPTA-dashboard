@@ -16,7 +16,6 @@ from operator import itemgetter
 with open('config.json') as f:
      credentials = json.loads(f.read())
 
-print(credentials['username'])
 mapbox_access_token = credentials["mapbox_access_token"]
 username = credentials["username"]
 api_key = credentials["api_key"]
